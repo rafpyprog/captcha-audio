@@ -1,6 +1,8 @@
 import io
 import os
 from subprocess import Popen, PIPE
+import tempfile
+
 
 import numpy as np
 
@@ -33,8 +35,10 @@ def info(audio_file, encoding='UTF-8'):
     return parse_stdout(info)
 
 
-def silence(infile, duration, threshold, output='letter.wav',
+def silence(infile, duration, threshold, tmp_dir=None, output='letter.wav',
                   verbosity=2):
+
+    print(os.listdir(tmp_dir))
 
     threshold = str(threshold) + '%'
     input_data = None
@@ -42,37 +46,29 @@ def silence(infile, duration, threshold, output='letter.wav',
 
     if isinstance(infile, io._io.BytesIO):
         input_data = infile.getvalue()
-        infile = '−'
+        infile = '-'
         stdin = PIPE
 
-    cmd = (f'sox -V{verbosity} -t wav {infile} "{output}" silence 1 {duration} '
-           f'{threshold} 1 {duration} {threshold} : newfile : restart')
 
-    proc = Popen(cmd, stdin=stdin)
+    cmd = f'sox -V2 -t wav {infile} letter.wav silence 1 {duration} {threshold} 1 {duration} {threshold} : newfile : restart'
+    print(cmd)
+    proc = Popen(cmd, stdin=stdin, cwd=tmp_dir, shell=True)
     out, err = proc.communicate(input=input_data)
+    print(os.listdir(tmp_dir))
     return proc.returncode
 
 db = Database()
-captcha = db.get_captcha(1)
+captcha = db.get_captcha(2)
 data = captcha.fetchall()[0][1]
 audio = io.BytesIO(data)
 
-info('letter001.wav')
-import tempfile
 
-for i in np.arange(6, 13, 0.25):
-    for j in np.arange(0, 0.175, 0.025):
+
+for t in np.arange(6, 13, 0.25):
+    for d in np.arange(0, 0.175, 0.025):
         with tempfile.TemporaryDirectory() as tmp:
             output = os.path.join(tmp, 'letter.wav')
-            silence(audio, j, i, output=output, verbosity=2)
+            silence(audio, duration=d, threshold=t, tmp_dir=tmp, output=output, verbosity=2)
             count_files = len(os.listdir(tmp))
             if count_files >= 6:
-                print(j, i, count_files)
-
-
-
-
-
-
-
-info('letter.wav')
+                print(d, t, count_files)
