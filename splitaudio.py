@@ -1,8 +1,16 @@
+import io
 import os
 import re
 from subprocess import Popen, PIPE
+import tempfile
+import time
 
 import numpy as np
+
+from sox import silence
+from database import Database
+
+
 
 LETTER_AUDIO_FILE = 'letter.wav'
 
@@ -20,18 +28,8 @@ def split_letters(audio_file, duration, threshold, output=LETTER_AUDIO_FILE,
     cmd = ['sox', f'-V{verbosity}', audio_file, output,
            f'silence 1 {duration} {threshold} 1 {duration} {threshold}',
            ': newfile', ': restart']
-
-    #cmd = (f'sox -V{verbosity} "{audio_file}" {output} silence 1 {duration} '
-    #       f'{threshold} 1 {duration} {threshold} : newfile : restart')
     proc = Popen(cmd, stdin=PIPE)
     os.system(cmd)
-
-
-def get_letters():
-    LETTER_AUDIO_FILE = 'letter.wav'
-    name, extension = LETTER_AUDIO_FILE.split('.')
-    letters = [i for i in os.listdir() if i.startswith(name)]
-    return letters
 
 
 def count_letters(letter_audio_file):
@@ -44,26 +42,23 @@ def assert_minimum_size(letters):
     MIN_SIZE = 2500
     MAX_SIZE = 11000
     SOUND_ERROR = 44
-    count = len(letters)
     valid_letters_count = 0
 
-    if count >= 6:
-        for letter in letters:
-            size = os.path.getsize(letter)
-            if size == SOUND_ERROR:
-                os.remove(letter)
-                continue
-            if MIN_SIZE < size < MAX_SIZE and valid_letters_count < 6:
-                valid_letters_count += 1
-            else:
-                return False
+    for letter in letters:
+        size = os.path.getsize(letter)
+        if size == SOUND_ERROR:
+            os.remove(letter)
+            continue
+        if MIN_SIZE < size < MAX_SIZE and valid_letters_count < 6:
+            valid_letters_count += 1
+        else:
+            return False
 
     return valid_letters_count == 6
 
 
 def validate_results():
-    LETTER_COUNT = 6
-    letters = get_letters()
+    letters = os.listdir()
     return assert_minimum_size(letters)
 
 
@@ -122,14 +117,16 @@ def log_performance(duration, threshold, performance, log='log.txt'):
         f.write(data + '\n')
 
 
-def solve_captcha(captcha, clean=True):
+def solve_captcha(captcha, clean=True, temp_dir=None):
     MIN_DURATION, MAX_DURATION, STEP_DURATION = 0, 0.175 + 0.025, 0.025
     MIN_THRESHOLD, MAX_THRESHOLD, STEP_THRESHOLD = 6.9, 13.10 + 0.10, 0.10
 
     for t in np.arange(MIN_THRESHOLD, MAX_THRESHOLD, STEP_THRESHOLD):
         for d in np.arange(MIN_DURATION, MAX_DURATION, STEP_DURATION):
-            split_letters(captcha, d, t)
-            solved = validate_results()
+            solved = False
+            letter_count = silence(captcha, d, t, cwd=temp_dir)
+            if letter_count >= 6:
+                solved = validate_results()
             if solved:
                 print('    Resultado:', d, t, 'SOLVED!')
                 if clean:
@@ -147,36 +144,31 @@ def save_result(resultado, log='log.txt'):
 
 
 if __name__ == '__main__':
-    data_dir = os.path.join(os.getcwd(), 'data')
-    os.chdir(data_dir)
-
+    HERE = os.getcwd()
+    db = Database()
+    captchas = [io.BytesIO(i[2]) for i in db.get_captchas()]
 
     stat_duration = [9999, 0]  # d, t
     stat_threshold = [9999, 0]
     resolvidos = 0
     performance = 0
 
-    captchas = get_captchas()[:500]
-    #captchas[29]
-    #solve_captcha(captchas[29], clean=False)
-
     for n, c in enumerate(captchas):
-        print(f'{n} - Solving {c}')
-        resultado = solve_captcha(c)
-        if resultado:
-            stat_duration[0] = min(stat_duration[0], resultado[0])
-            stat_duration[1] = max(stat_duration[1], resultado[0])
+        with tempfile.TemporaryDirectory() as temp_dir:
+            os.chdir(temp_dir)
+            print(f'\n{n} - {temp_dir}')
+            resultado = solve_captcha(c, temp_dir=temp_dir)
+            if resultado:
+                stat_duration[0] = min(stat_duration[0], resultado[0])
+                stat_duration[1] = max(stat_duration[1], resultado[0])
 
-            stat_threshold[0] = min(stat_threshold[0], resultado[1])
-            stat_threshold[1] = max(stat_threshold[1], resultado[1])
+                stat_threshold[0] = min(stat_threshold[0], resultado[1])
+                stat_threshold[1] = max(stat_threshold[1], resultado[1])
 
-            resolvidos += 1
-            save_result(resultado)
-        performance = resolvidos / len(captchas) * 100
+                resolvidos += 1
+                save_result(resultado)
+            performance = resolvidos / (n + 1)
 
-        print('Duration    :', stat_duration)
-        print('Threshold   :', stat_threshold)
-        print('Performance :', '{0:.2f}%'.format(performance))
-
-
-#70.5
+            print('Duration    :', stat_duration)
+            print('Threshold   :', stat_threshold)
+            print('Performance :', '{0:.2f}%'.format(performance * 100))
