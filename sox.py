@@ -36,7 +36,7 @@ def info(audio_file, encoding='UTF-8'):
 
 
 def silence(infile, duration, threshold, tmp_dir=None, output='letter.wav',
-                  verbosity=2):
+            verbosity=2):
 
     print(os.listdir(tmp_dir))
 
@@ -49,9 +49,8 @@ def silence(infile, duration, threshold, tmp_dir=None, output='letter.wav',
         infile = '-'
         stdin = PIPE
 
-
-    cmd = f'sox -V2 -t wav {infile} letter.wav silence 1 {duration} {threshold} 1 {duration} {threshold} : newfile : restart'
-    print(cmd)
+    cmd = (f'sox -V2 -t wav {infile} letter.wav silence 1 {duration} '
+           f'{threshold} 1 {duration} {threshold} : newfile : restart')
     proc = Popen(cmd, stdin=stdin, cwd=tmp_dir, shell=True)
     out, err = proc.communicate(input=input_data)
     print(os.listdir(tmp_dir))
