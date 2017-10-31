@@ -17,8 +17,13 @@ def file_info(filepath):
 def split_letters(audio_file, duration, threshold, output=LETTER_AUDIO_FILE,
                   verbosity=2):
     threshold = str(threshold) + '%'
-    cmd = (f'sox -V{verbosity} "{audio_file}" {output} silence 1 {duration} '
-           f'{threshold} 1 {duration} {threshold} : newfile : restart')
+    cmd = ['sox', f'-V{verbosity}', audio_file, output,
+           f'silence 1 {duration} {threshold} 1 {duration} {threshold}',
+           ': newfile', ': restart']
+
+    #cmd = (f'sox -V{verbosity} "{audio_file}" {output} silence 1 {duration} '
+    #       f'{threshold} 1 {duration} {threshold} : newfile : restart')
+    proc = Popen(cmd, stdin=PIPE)
     os.system(cmd)
 
 
