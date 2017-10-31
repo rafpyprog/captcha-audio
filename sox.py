@@ -46,7 +46,7 @@ def silence(infile, duration, threshold, output='letter.wav',
         stdin = PIPE
 
     cmd = (f'sox -V{verbosity} -t wav {infile} "{output}" silence 1 {duration} '
-           f'{threshold} 1 {duration} {threshold} :newfile :restart')
+           f'{threshold} 1 {duration} {threshold} : newfile : restart')
 
     proc = Popen(cmd, stdin=stdin)
     out, err = proc.communicate(input=input_data)
@@ -61,16 +61,16 @@ info('letter001.wav')
 import tempfile
 
 for i in np.arange(6, 13, 0.25):
-    for j in np.arange(0, 0.19, 0.025):
+    for j in np.arange(0, 0.175, 0.025):
         with tempfile.TemporaryDirectory() as tmp:
             output = os.path.join(tmp, 'letter.wav')
             silence(audio, j, i, output=output, verbosity=2)
-            print(len(os.listdir(tmp)))
+            count_files = len(os.listdir(tmp))
+            if count_files >= 6:
+                print(j, i, count_files)
 
 
 
-for i in np.arange(0.025, 0.175, 0.025):
-    for j in np.arange(6, 12, 1):
 
 
 
