@@ -3,14 +3,12 @@ import time
 
 import fire
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
-from selenium.webdriver import Chrome
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from browser import set_chrome, load_SIPAC
-from database import Database
 
 CAPTCHA_WAV = 'GerarSomCaptcha.wav'
 
@@ -21,7 +19,8 @@ def check_too_many_requests_error(driver):
     return TOO_MANY_REQUESTS in driver.page_source
 
 
-def load_audio_captcha(driver, webdriverwait=2, wait_too_many_requests=5, retry=True):
+def load_audio_captcha(driver, webdriverwait=2, wait_too_many_requests=5,
+                       retry=True):
     WAIT = WebDriverWait(driver, webdriverwait)
     SOUND = ('https://www.receita.fazenda.gov.br/Aplicacoes/SSL/ATFLA/'
              'Sipac.App/GerarSomCaptcha.aspx?sid=0.2556393534615946')
@@ -50,7 +49,7 @@ def load_audio_captcha(driver, webdriverwait=2, wait_too_many_requests=5, retry=
 def click_download_audio(driver, player):
     action = webdriver.common.action_chains.ActionChains(driver)
     x, y = 270, -1
-    action.move_to_element_with_offset(player, x, -1)
+    action.move_to_element_with_offset(player, x, y)
     action.click()
     action.perform()
 
@@ -111,13 +110,12 @@ def main(n=10, download_dir=None, overwrite=False):
             if file_exists is False:
                 save_captcha_audio(driver, filename)
             elif file_exists is True and overwrite is True:
-                os.remove(path)
+                os.remove(filename)
                 save_captcha_audio(driver, filename)
             else:
                 print(f'Overwrite is true. Skipping file {filename}.')
     finally:
         driver.quit()
-
 
 
 if __name__ == '__main__':

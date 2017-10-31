@@ -1,12 +1,6 @@
 import io
 import os
 from subprocess import Popen, PIPE
-import time
-import tempfile
-
-import numpy as np
-
-from database import Database
 
 
 def parse_stdout(stdout):
@@ -26,7 +20,7 @@ def info(audio_file, encoding='UTF-8'):
     else:
         infile = '−'
         input_data = audio_file.getvalue()
-        stdin=PIPE
+        stdin = PIPE
 
     cmd = f'sox --info {infile}'
     proc = Popen(cmd, stdout=PIPE, stdin=stdin)

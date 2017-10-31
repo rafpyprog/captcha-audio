@@ -1,5 +1,3 @@
-from io import BytesIO
-import os
 import sqlite3
 
 
@@ -18,7 +16,7 @@ class Database():
 
     def initialize(self):
         create_table = (f'''CREATE TABLE {self.table} (image BLOB, '''
-                       f'''audio BLOB, split INTEGER, solution TEXT);''')
+                        f'''audio BLOB, split INTEGER, solution TEXT);''')
         self.cursor.execute(create_table)
         self.commit()
 

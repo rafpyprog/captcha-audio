@@ -1,6 +1,5 @@
 import os
 
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver import Chrome, ChromeOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -25,6 +24,7 @@ def set_chrome(download_dir=None, headless=False):
 
 def load_SIPAC(driver, webdriverwait=5):
     WAIT = WebDriverWait(driver, webdriverwait)
-    SIPAC = 'https://www.receita.fazenda.gov.br/Aplicacoes/SSL/ATFLA/Sipac.App/'
+    SIPAC = ('https://www.receita.fazenda.gov.br/Aplicacoes/SSL/ATFLA/'
+             'Sipac.App/')
     driver.get(SIPAC)
     WAIT.until(EC.visibility_of_element_located((By.ID, 'imgcaptcha')))

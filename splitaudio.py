@@ -3,13 +3,11 @@ import os
 import re
 from subprocess import Popen, PIPE
 import tempfile
-import time
 
 import numpy as np
 
 from sox import silence
 from database import Database
-
 
 
 LETTER_AUDIO_FILE = 'letter.wav'
@@ -28,7 +26,6 @@ def split_letters(audio_file, duration, threshold, output=LETTER_AUDIO_FILE,
     cmd = ['sox', f'-V{verbosity}', audio_file, output,
            f'silence 1 {duration} {threshold} 1 {duration} {threshold}',
            ': newfile', ': restart']
-    proc = Popen(cmd, stdin=PIPE)
     os.system(cmd)
 
 
@@ -111,8 +108,8 @@ def process_capthcas(captchas, duration, threshold, target=0):
 
 
 def log_performance(duration, threshold, performance, log='log.txt'):
-    formater = lambda x: '{0:.4f}'.format(x)
-    data = ';'.join([formater(i) for i in [duration, threshold, performance]])
+    values = (duration, threshold, performance)
+    data = ';'.join([str.format('{0:.4f}', i) for i in values])
     with open(log, 'a') as f:
         f.write(data + '\n')
 

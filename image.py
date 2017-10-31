@@ -3,7 +3,8 @@ from io import BytesIO
 
 
 def save_captcha_image(driver, filename):
-    SIPAC = 'https://www.receita.fazenda.gov.br/Aplicacoes/SSL/ATFLA/Sipac.App/'
+    SIPAC = ('https://www.receita.fazenda.gov.br/Aplicacoes/SSL/'
+             'ATFLA/Sipac.App/')
     if driver.current_url == SIPAC is False:
         raise ValueError('Sipac não está carregado no browser.]')
     captcha = crop_captcha(driver)
@@ -25,9 +26,6 @@ def get_captcha_location(driver):
 def crop_captcha(driver):
     location = get_captcha_location(driver)
     screenshot = take_screenshot(driver)
-
-    #driver.execute_script(f'window.scrollTo(0, {location["y"]})')
-
 
     CAPTCHA_WIDTH, CAPTCHA_HEIGHT = 180, 50
     CAPTCHA_IMAGE = (location['x'],

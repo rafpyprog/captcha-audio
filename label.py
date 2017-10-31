@@ -1,7 +1,6 @@
 import io
 import os
-import re
-import time
+
 
 from IPython import display
 from PIL import Image
@@ -12,6 +11,7 @@ from database import Database
 def load_image(data):
     im = io.BytesIO(data)
     return Image.open(im)
+
 
 DATA_FOLDER = os.path.join(os.getcwd(), 'data')
 db = Database()

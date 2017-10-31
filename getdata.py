@@ -2,7 +2,7 @@ import os
 import tempfile
 import time
 
-from audio import (save_captcha_audio, load_audio_captcha, click_download_audio,
+from audio import (load_audio_captcha, click_download_audio,
                    check_download_finished)
 from browser import set_chrome, load_SIPAC
 from database import Database
