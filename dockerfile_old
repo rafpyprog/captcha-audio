@@ -1,0 +1,23 @@
+FROM python:alpine
+
+ENV app /captcha-audio
+ENV PATH="$app/chromedriver:${PATH}"
+ENV LIBRARY_PATH=/lib:/usr/lib
+
+RUN apk update
+
+RUN apk add python-dev python3-dev
+RUN apk add gcc musl-dev
+RUN apk add xorg-server udev dbus ttf-freefont mesa-dri-swrast grep
+RUN apk add sox
+RUN apk add zlib-dev jpeg-dev
+RUN apk add chromium chromium-chromedriver xvfb
+
+RUN mkdir $app
+
+COPY requirements.txt .
+RUN pip install -r /requirements.txt
+
+COPY *.py $app/
+
+WORKDIR $app

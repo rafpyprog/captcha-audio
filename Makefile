@@ -18,7 +18,7 @@ docker-build:
 
 docker-run:
 	@echo Mounting database: $(database_path)
-	@docker run --rm -it -v "$(database_path)":/$(APP)/$(DATABASE_FILE) --name work $(APP):production sh
+	@docker run --rm -it -v "$(database_path)":/$(APP)/$(DATABASE_FILE) --name work $(APP):production /bin/bash
 
 
 docker-update-py:

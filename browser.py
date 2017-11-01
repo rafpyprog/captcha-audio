@@ -1,10 +1,15 @@
 import os
 
+from pyvirtualdisplay import Display
 from selenium.webdriver import Chrome, ChromeOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
+
+def set_virtual_display(size=(800, 600)):
+    display = Display(visible=0, size=size)        
+    return display
 
 def set_chrome(download_dir=None, headless=False):
     if not download_dir:

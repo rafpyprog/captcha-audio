@@ -4,7 +4,7 @@ import time
 
 from audio import (load_audio_captcha, click_download_audio,
                    check_download_finished)
-from browser import set_chrome, load_SIPAC
+from browser import set_chrome, load_SIPAC, set_virtual_display
 from database import Database
 from image import save_captcha_image
 
@@ -55,6 +55,8 @@ if __name__ == '__main__':
         time.sleep(5)
         db = Database()
 
+        display = set_virtual_display()
+        display.start()
         sipac = SIPAC(tmp_dir)
         sipac.start()
 

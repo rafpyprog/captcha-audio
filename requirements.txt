@@ -1,3 +1,5 @@
+fire
 float_range
-numpy
+pillow
+pyvirtualdisplay
 selenium
