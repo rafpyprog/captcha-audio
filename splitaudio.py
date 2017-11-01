@@ -4,7 +4,7 @@ import re
 from subprocess import Popen, PIPE
 import tempfile
 
-import numpy as np
+import float_range
 
 from sox import silence
 from database import Database
@@ -118,8 +118,8 @@ def solve_captcha(captcha, clean=True, temp_dir=None):
     MIN_DURATION, MAX_DURATION, STEP_DURATION = 0, 0.175 + 0.025, 0.025
     MIN_THRESHOLD, MAX_THRESHOLD, STEP_THRESHOLD = 6.9, 13.10 + 0.10, 0.10
 
-    for t in np.arange(MIN_THRESHOLD, MAX_THRESHOLD, STEP_THRESHOLD):
-        for d in np.arange(MIN_DURATION, MAX_DURATION, STEP_DURATION):
+    for t in float_range.range(MIN_THRESHOLD, MAX_THRESHOLD, STEP_THRESHOLD):
+        for d in float_range.range(MIN_DURATION, MAX_DURATION, STEP_DURATION):
             solved = False
             letter_count = silence(captcha, d, t, cwd=temp_dir)
             if letter_count >= 6:

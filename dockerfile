@@ -5,6 +5,7 @@ ENV app /captcha-audio
 
 RUN apk update
 RUN apk add sox
+RUN apk add ca-certificates
 RUN apk --no-cache add musl-dev linux-headers g++
 
 RUN mkdir $app
