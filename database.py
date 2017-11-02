@@ -47,12 +47,18 @@ class Database():
         return self.cursor.execute(select, args)
 
     def get_captcha(self, rowid):
-        select = f'''SELECT * FROM {self.table} WHERE rowid = ?;'''
+        select = f'''SELECT rowid, * FROM {self.table} WHERE rowid = ?;'''
         return self.cursor.execute(select, (rowid,))
 
     def delete_captcha(self, rowid):
         delete = f'''DELETE FROM {self.table} WHERE rowid = ?'''
         self.cursor.execute(delete, (rowid,))
+        self.commit()
+
+    def set_split(self, rowid, value):
+        assert isinstance(value, bool) or value == 99
+        update = f'''UPDATE {self.table} SET split = ? WHERE rowid = ?;'''
+        self.cursor.execute(update, (value, rowid,))
         self.commit()
 
     def insert_solution(self, rowid, solution):

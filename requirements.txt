@@ -1,5 +1,7 @@
 fire
 float_range
+jupyter
+notebook
 pillow
 pyvirtualdisplay
 pyscreenshot

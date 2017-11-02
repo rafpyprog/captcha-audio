@@ -6,11 +6,13 @@ RUN apt-get install -y sox
 
 # Install python package requirements
 COPY requirements.txt .
-RUN pip3 install -r requirements.txt
-RUN rm requirements.txt
+RUN pip3 install -r requirements.txt \
+    && rm requirements.txt
 
 # Create app folder and copy source code
 RUN mkdir $app
-COPY *.py $app/
+#COPY *.py $app/
 
 WORKDIR $app
+
+EXPOSE 8888
