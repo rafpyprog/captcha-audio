@@ -2,9 +2,11 @@ import os
 import tempfile
 import time
 
+from pyvirtualdisplay import Display
+
 from audio import (load_audio_captcha, click_download_audio,
                    check_download_finished)
-from browser import set_chrome, load_SIPAC, set_virtual_display
+from browser import set_chrome, load_SIPAC
 from database import Database
 from image import save_captcha_image
 
@@ -33,6 +35,7 @@ class SIPAC():
         load_SIPAC(self.driver)
         filename = filename + '.png'
         save_captcha_image(self.driver, filename)
+        print(os.listdir())
 
     def save_audio(self, filename):
         filename = filename + '.wav'
@@ -44,7 +47,9 @@ class SIPAC():
             else:
                 click_download_audio(self.driver, player)
                 download_finished = check_download_finished()
-        DOWNLOAD_NAME = 'GerarSomCaptcha.wav'
+
+        #DOWNLOAD_NAME = 'GerarSomCaptcha.wav'
+        DOWNLOAD_NAME = 'GerarSomCaptcha.aspx'
         os.rename(DOWNLOAD_NAME, filename)
 
 
@@ -52,11 +57,13 @@ if __name__ == '__main__':
     DATA_DIR = os.path.join(os.getcwd(), 'data')
     with tempfile.TemporaryDirectory() as tmp_dir:
         print(f'Working on: {tmp_dir}')
-        time.sleep(5)
         db = Database()
 
-        display = set_virtual_display()
+        print('Starting Virtual Display')
+        display = Display(visible=False)
         display.start()
+
+        print('Starting Chrome')
         sipac = SIPAC(tmp_dir)
         sipac.start()
 
@@ -78,3 +85,4 @@ if __name__ == '__main__':
 
     db.close()
     sipac.driver.close()
+    display.stop()

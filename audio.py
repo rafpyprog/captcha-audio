@@ -54,14 +54,14 @@ def click_download_audio(driver, player):
     action.perform()
 
 
-def check_download_finished(timeout=2):
+def check_download_finished(timeout=2, filename='GerarSomCaptcha.aspx'):
     print('Waiting Download')
     is_finished = False
     elapsed_time = 0
     start_time = time.time()
 
     while is_finished is False and elapsed_time <= timeout:
-        files = [i for i in os.listdir() if i == 'GerarSomCaptcha.wav']
+        files = [i for i in os.listdir() if i == filename]
         is_finished = bool(files)
         elapsed_time = time.time() - start_time
 

@@ -2,4 +2,5 @@ fire
 float_range
 pillow
 pyvirtualdisplay
+pyscreenshot
 selenium

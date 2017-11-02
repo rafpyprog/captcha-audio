@@ -1,15 +1,10 @@
 import os
 
-from pyvirtualdisplay import Display
 from selenium.webdriver import Chrome, ChromeOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-
-def set_virtual_display(size=(800, 600)):
-    display = Display(visible=0, size=size)        
-    return display
 
 def set_chrome(download_dir=None, headless=False):
     if not download_dir:
@@ -18,9 +13,13 @@ def set_chrome(download_dir=None, headless=False):
         if os.path.isabs(download_dir) is False:
             download_dir = os.path.join(os.getcwd(), download_dir)
             print(download_dir)
+
     options = ChromeOptions()
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-gpu')
     prefs = {"download.default_directory": download_dir}
     options.add_experimental_option("prefs", prefs)
+
     if headless:
         options.add_argument("--headless")
         options.add_argument("--disable-gpu")
