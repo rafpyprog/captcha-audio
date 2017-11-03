@@ -11,7 +11,6 @@ RUN pip3 install -r requirements.txt \
 
 # Create app folder and copy source code
 RUN mkdir $app
-#COPY *.py $app/
 
 WORKDIR $app
 

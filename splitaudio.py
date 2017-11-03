@@ -114,6 +114,15 @@ def log_performance(duration, threshold, performance, log='log.txt'):
         f.write(data + '\n')
 
 
+def letters_audio():
+    letters = []
+    for i in sorted(os.listdir()):
+        with open(i, 'rb') as f:
+            audio = f.read()
+        letters.append(audio)
+    return letters
+
+
 def solve_captcha(captcha, clean=True, temp_dir=None):
     MIN_DURATION, MAX_DURATION, STEP_DURATION = 0, 0.175 + 0.025, 0.025
     MIN_THRESHOLD, MAX_THRESHOLD, STEP_THRESHOLD = 6.9, 13.10 + 0.10, 0.10
@@ -126,9 +135,9 @@ def solve_captcha(captcha, clean=True, temp_dir=None):
                 solved = validate_results()
             if solved:
                 print('    Resultado:', d, t, 'SOLVED!')
+                return (d, t), letters_audio()
                 if clean:
                     clean_up(LETTER_AUDIO_FILE)
-                return d, t
             clean_up(LETTER_AUDIO_FILE)
     print('    Resultado:', 'NOT SOLVED.')
     return False

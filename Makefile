@@ -17,8 +17,7 @@ docker-build:
 
 
 docker-run:
-	@echo Mounting database: $(database_path)
-	@docker run --rm -it -v "$(database_path)":/$(APP)/$(DATABASE_FILE) --name work $(APP):production /bin/bash
+	@docker run --rm -it -v "$(cwd)":/$(APP) --name work $(APP):production /bin/bash
 
 docker-run-jupyter:
 	docker run --rm -p 8888:8888 -v "$(cwd)":/$(APP) $(APP):production /bin/bash -c "jupyter notebook --ip=0.0.0.0 --allow-root --no-browser"

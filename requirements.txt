@@ -2,6 +2,7 @@ fire
 float_range
 jupyter
 notebook
+numpy
 pillow
 pyvirtualdisplay
 pyscreenshot

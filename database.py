@@ -7,6 +7,7 @@ class Database():
         self.conn = sqlite3.connect(self.filename)
         self.cursor = self.conn.cursor()
         self.table = 'captchas'
+        self.initialize()
 
     def commit(self):
         self.conn.commit()
@@ -15,8 +16,9 @@ class Database():
         self.conn.close()
 
     def initialize(self):
-        create_table = (f'''CREATE TABLE {self.table} (image BLOB, '''
-                        f'''audio BLOB, split INTEGER, solution TEXT);''')
+        create_table = (f'CREATE TABLE IF NOT EXISTS {self.table} '
+                        f'(image BLOB, audio BLOB, split INTEGER, '
+                        f'solution TEXT);')
         self.cursor.execute(create_table)
         self.commit()
 
