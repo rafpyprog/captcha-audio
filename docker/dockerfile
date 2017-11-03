@@ -2,10 +2,17 @@ FROM alpine:edge
 
 COPY requirements.txt .
 
-RUN apk add --update --no-cache chromium chromium-chromedriver udev \
-                                ttf-freefont python3 py3-pip xvfb \
-                                gcc python3-dev \
-                                && LIBRARY_PATH=/lib:/usr/lib pip3 install -r requirements.txt
+RUN apk add --progress --update --no-cache \
+        sox \
+        python3 python3-dev py3-pip \
+        gcc \
+        chromium chromium-chromedriver xvfb udev ttf-freefont
+
+RUN apk add --progress --no-cache build-base jpeg-dev zlib-dev freetype-dev \
+            lcms2-dev openjpeg-dev tiff-dev tk-dev tcl-dev harfbuzz-dev \
+            fribidi-dev 
+
+RUN LIBRARY_PATH=/lib:/usr/lib pip3 install -r requirements.txt
 
 RUN apk del --purge --force g++ gcc linux-headers binutils-gold gnupg \
     zlib-dev libc-utils \
