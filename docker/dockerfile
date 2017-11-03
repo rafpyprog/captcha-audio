@@ -1,0 +1,18 @@
+FROM alpine:edge
+
+COPY requirements.txt .
+
+RUN apk add --update --no-cache chromium chromium-chromedriver udev \
+                                ttf-freefont python3 py3-pip xvfb \
+                                gcc python3-dev \
+                                && LIBRARY_PATH=/lib:/usr/lib pip3 install -r requirements.txt
+
+RUN apk del --purge --force g++ gcc linux-headers binutils-gold gnupg \
+    zlib-dev libc-utils \
+    && rm -rf /var/cache/apk/*
+
+
+CMD chromium-browser -version
+
+
+#375
