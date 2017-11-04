@@ -28,6 +28,7 @@ class SIPAC():
             os.remove(tmp_file)
 
     def save_data(self, filename, delay=2.5):
+        self.clean_tmp_files()
         self.save_image(filename)
         time.sleep(delay)
         audio_loaded = self.save_audio(filename)

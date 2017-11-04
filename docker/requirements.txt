@@ -3,7 +3,9 @@ float_range
 jupyter
 notebook
 numpy
+pandas
 pillow
+pyaudioanalysis
 pyvirtualdisplay
 pyscreenshot
 selenium
