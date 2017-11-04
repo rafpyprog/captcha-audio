@@ -23,11 +23,16 @@ class SIPAC():
     def start(self):
         self.driver = set_chrome(self.download_dir)
 
+    def clean_tmp_files(self):
+        for tmp_file in os.listdir():
+            os.remove(tmp_file)
+
     def save_data(self, filename, delay=2.5):
         self.save_image(filename)
         time.sleep(delay)
         audio_loaded = self.save_audio(filename)
         if audio_loaded is False:
+            self.clean_tmp_files()
             print('Não foi possível carregar o áudio, tentando novo captcha.')
             self.save_data(filename)
 
@@ -35,22 +40,21 @@ class SIPAC():
         load_SIPAC(self.driver)
         filename = filename + '.png'
         save_captcha_image(self.driver, filename)
-        print(os.listdir())
 
     def save_audio(self, filename):
         filename = filename + '.wav'
         download_finished = False
-        while download_finished is False:
-            player = load_audio_captcha(self.driver, retry=False)
-            if not player:
-                return False
-            else:
-                click_download_audio(self.driver, player)
-                download_finished = check_download_finished()
-
-        #DOWNLOAD_NAME = 'GerarSomCaptcha.wav'
-        DOWNLOAD_NAME = 'GerarSomCaptcha.aspx'
-        os.rename(DOWNLOAD_NAME, filename)
+        player = load_audio_captcha(self.driver, retry=False)
+        if not player:
+            return False
+        click_download_audio(self.driver, player)
+        download_finished = check_download_finished()
+        if download_finished:
+            DOWNLOAD_NAME = 'GerarSomCaptcha.aspx'
+            os.rename(DOWNLOAD_NAME, filename)
+            return True
+        else:
+            return False
 
 
 if __name__ == '__main__':

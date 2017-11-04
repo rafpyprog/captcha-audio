@@ -6,20 +6,18 @@ RUN apk add --progress --update --no-cache \
         sox \
         python3 python3-dev py3-pip \
         gcc \
-        chromium chromium-chromedriver xvfb udev ttf-freefont
+        chromium chromium-chromedriver xvfb udev ttf-freefont \
+        build-base jpeg-dev zlib-dev freetype-dev lcms2-dev openjpeg-dev \
+        tiff-dev tk-dev tcl-dev harfbuzz-dev fribidi-dev \
+    && LIBRARY_PATH=/lib:/usr/lib pip3 install -r requirements.txt
 
-RUN apk add --progress --no-cache build-base jpeg-dev zlib-dev freetype-dev \
-            lcms2-dev openjpeg-dev tiff-dev tk-dev tcl-dev harfbuzz-dev \
-            fribidi-dev 
-
-RUN LIBRARY_PATH=/lib:/usr/lib pip3 install -r requirements.txt
-
-RUN apk del --purge --force g++ gcc linux-headers binutils-gold gnupg \
-    zlib-dev libc-utils \
+RUN apk del make gcc build-base $(apk info | grep -e \\-dev$ | \
+                                  grep -v -e jpeg | grep -v tiff) \
     && rm -rf /var/cache/apk/*
 
+RUN mkdir /captcha-audio
+WORKDIR /captcha-audio
 
-CMD chromium-browser -version
+CMD python3 getdata.py
 
-
-#375
+EXPOSE 8888

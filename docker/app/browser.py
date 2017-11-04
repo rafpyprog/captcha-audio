@@ -15,8 +15,8 @@ def set_chrome(download_dir=None, headless=False):
             print(download_dir)
 
     options = ChromeOptions()
-    #options.add_argument('--no-sandbox')
-    #options.add_argument('--disable-gpu')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-gpu')
     prefs = {"download.default_directory": download_dir}
     options.add_experimental_option("prefs", prefs)
 
