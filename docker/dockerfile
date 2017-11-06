@@ -7,6 +7,7 @@ RUN apk add --update --no-cache --progress --virtual=.build-dependencies \
         build-base freetype-dev g++ gcc gfortran harfbuzz-dev lcms2-dev \
         make musl-dev python3-dev tk-dev tcl-dev fribidi-dev zlib-dev
 
+
 RUN apk add --progress --no-cache \
         sox \
         python3 py3-pip \
@@ -14,14 +15,19 @@ RUN apk add --progress --no-cache \
         jpeg-dev openjpeg-dev tiff-dev \
         libstdc++ lapack-dev llvm-dev
 
+
 RUN ln -s locale.h /usr/include/xlocale.h \
     && LIBRARY_PATH=/lib:/usr/lib pip3 install -r requirements.txt
 
+
 RUN apk del .build-dependencies
+
 
 RUN mkdir /captcha-audio
 WORKDIR /captcha-audio
 
+
 CMD python3 getdata.py
+
 
 EXPOSE 8888

@@ -3,7 +3,7 @@ import os
 import re
 from subprocess import Popen, PIPE
 import tempfile
-
+import threading
 import float_range
 
 from sox import silence
@@ -11,7 +11,7 @@ from database import Database
 
 
 LETTER_AUDIO_FILE = 'letter.wav'
-
+finished_flag = 0
 
 def file_info(filepath):
     get_info = ['sox', '--info', filepath]
@@ -35,7 +35,7 @@ def count_letters(letter_audio_file):
     return count
 
 
-def assert_minimum_size(letters):
+def assert_minimum_size(letters, path):
     MIN_SIZE = 2500
     MAX_SIZE = 11000
     SOUND_ERROR = 44
@@ -54,18 +54,17 @@ def assert_minimum_size(letters):
     return valid_letters_count == 6
 
 
-def validate_results():
+def validate_results(path='.'):
     pattern = '^letter\d{3}\.wav$'
-    letters = [fn for fn in os.listdir() if re.match(pattern, fn)]
-    return assert_minimum_size(letters)
+    letters = [os.path.join(path, fn) for fn in os.listdir(path) if re.match(pattern, fn)]
+    return assert_minimum_size(letters, path)
 
 
-def clean_up(letter_audio_file):
-    name, extension = letter_audio_file.split('.')
-    letters = [i for i in os.listdir() if i.startswith(name)]
+def clean_up(letter_audio_file, path='.'):
+    pattern = '^letter\d{3}\.wav$'
+    letters = [os.path.join(path, fn) for fn in os.listdir(path) if re.match(pattern, fn)]
     for i in letters:
-        filepath = os.path.join(os.getcwd(), i)
-        os.remove(filepath)
+        os.remove(i)
 
 
 def get_captchas():
@@ -74,18 +73,6 @@ def get_captchas():
     captchas = [os.path.join(cwd, i) for i in os.listdir()
                 if re.match(pattern, i)]
     return captchas
-
-
-def best_performance_at_end(total, processed, sucess):
-    remainign = total - processed
-    return (remainign + sucess) / total
-
-
-def can_beat_target(target, best_performance):
-    if best_performance < target:
-        return False
-    else:
-        return True
 
 
 def process_capthcas(captchas, duration, threshold, target=0):
@@ -108,13 +95,6 @@ def process_capthcas(captchas, duration, threshold, target=0):
     return performance
 
 
-def log_performance(duration, threshold, performance, log='log.txt'):
-    values = (duration, threshold, performance)
-    data = ';'.join([str.format('{0:.4f}', i) for i in values])
-    with open(log, 'a') as f:
-        f.write(data + '\n')
-
-
 def letters_audio():
     letters = []
     pattern = '^letter\d{3}\.wav$'
@@ -126,23 +106,30 @@ def letters_audio():
     return letters
 
 
-def solve_captcha(captcha, clean=True, temp_dir=None):
-    MIN_DURATION, MAX_DURATION, STEP_DURATION = 0, 0.175 + 0.025, 0.025
-    MIN_THRESHOLD, MAX_THRESHOLD, STEP_THRESHOLD = 6.9, 13.10 + 0.10, 0.10
+def solve_captcha(captcha, clean=True,
+                  duration={'min':0, 'max': 0.175, 'step': 0.025},
+                  threshold={'min': 6.9, 'max': 13.10, 'step': 0.10},
+                  temp_dir=None, use_finished_flag=False):
+
+    MIN_DURATION = duration['min']
+    STEP_DURATION = duration['step']
+    MAX_DURATION = duration['max'] + STEP_DURATION
+
+    MIN_THRESHOLD = threshold['min']
+    STEP_THRESHOLD = threshold['step']
+    MAX_THRESHOLD = threshold['max'] + STEP_THRESHOLD
 
     for t in float_range.range(MIN_THRESHOLD, MAX_THRESHOLD, STEP_THRESHOLD):
         for d in float_range.range(MIN_DURATION, MAX_DURATION, STEP_DURATION):
             solved = False
             letter_count = silence(captcha, d, t, cwd=temp_dir)
             if letter_count >= 6:
-                solved = validate_results()
+                solved = validate_results(temp_dir)
             if solved:
-                print('    Resultado:', d, t, 'SOLVED!')
                 return (d, t), letters_audio()
                 if clean:
                     clean_up(LETTER_AUDIO_FILE)
-            clean_up(LETTER_AUDIO_FILE)
-    print('    Resultado:', 'NOT SOLVED.')
+            clean_up(LETTER_AUDIO_FILE, temp_dir)    
     return False
 
 

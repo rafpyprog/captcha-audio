@@ -2,6 +2,7 @@ fire
 float_range
 jupyter
 librosa
+matplotlib
 notebook
 numpy
 pandas

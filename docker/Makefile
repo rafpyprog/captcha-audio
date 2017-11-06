@@ -36,5 +36,9 @@ getdata:
 	@docker run --rm -it -v "$(cwd)/app/":/$(APP) --name getdata $(APP):production python3 getdata.py
 
 
+sipac:
+	@docker run --rm -it -v "$(cwd)/app/":/$(APP) --name sipac $(APP):production python3 producao.py
+
+
 alpine-sh:
 	@docker run --rm -it -v "$(cwd)/app/":/$(APP) --name work $(APP):production sh
