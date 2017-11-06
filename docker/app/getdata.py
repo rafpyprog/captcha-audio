@@ -23,6 +23,9 @@ class SIPAC():
     def start(self):
         self.driver = set_chrome(self.download_dir)
 
+    def load_SIPAC(self):
+        load_SIPAC(self.driver)
+
     def clean_tmp_files(self):
         for tmp_file in os.listdir():
             os.remove(tmp_file)
@@ -38,7 +41,7 @@ class SIPAC():
             self.save_data(filename)
 
     def save_image(self, filename):
-        load_SIPAC(self.driver)
+        self.load_SIPAC()
         filename = filename + '.png'
         save_captcha_image(self.driver, filename)
 

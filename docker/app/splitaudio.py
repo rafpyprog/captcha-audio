@@ -55,7 +55,8 @@ def assert_minimum_size(letters):
 
 
 def validate_results():
-    letters = os.listdir()
+    pattern = '^letter\d{3}\.wav$'
+    letters = [fn for fn in os.listdir() if re.match(pattern, fn)]
     return assert_minimum_size(letters)
 
 
@@ -116,7 +117,9 @@ def log_performance(duration, threshold, performance, log='log.txt'):
 
 def letters_audio():
     letters = []
-    for i in sorted(os.listdir()):
+    pattern = '^letter\d{3}\.wav$'
+    files = [fn for fn in os.listdir() if re.match(pattern, fn)]
+    for i in sorted(files):
         with open(i, 'rb') as f:
             audio = f.read()
         letters.append(audio)

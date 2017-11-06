@@ -1,11 +1,13 @@
 fire
 float_range
 jupyter
+librosa
 notebook
 numpy
 pandas
 pillow
-pyaudioanalysis
 pyvirtualdisplay
 pyscreenshot
 selenium
+scipy
+scikit-learn
